@@ -33,7 +33,7 @@ const BarBadge = styled('img')({
 
 const BarBlock = styled('img')({
   position: 'relative',
-  top: '0.25em',
+  top: '0.20em',
   marginRight: '3px',
   height: '14px',
   width: '14px'
