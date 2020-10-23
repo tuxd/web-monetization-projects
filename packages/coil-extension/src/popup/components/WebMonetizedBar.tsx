@@ -25,7 +25,6 @@ const CoilBar = styled('div')({
 
 const BarBadge = styled('img')({
   position: 'relative',
-  top: '0.20em',
   marginRight: '4px',
   height: '14px',
   width: '13px'
@@ -33,10 +32,16 @@ const BarBadge = styled('img')({
 
 const BarBlock = styled('img')({
   position: 'relative',
-  top: '0.20em',
   marginRight: '3px',
   height: '14px',
   width: '14px'
+})
+
+const BarWrap = styled('a')({
+  display: 'flex',
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center'
 })
 
 const CoilMenu = withStyles({
@@ -108,7 +113,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
         onMouseEnter={() => setHovered(true)}
       >
         <Typography variant='caption'>
-          <a onClick={handleMenuClick}>
+          <BarWrap onClick={handleMenuClick}>
             {monetized &&
             (hovered || Object.values(blockOptions).some(Boolean)) ? (
               <BarBlock src='/res/block.svg' width='14' height='14' />
@@ -125,7 +130,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
               : ' This ' + contentOrSite + ' is'}
             {monetized ? '' : ' not'}
             {monetized && adapted ? '' : ' Web-Monetized'}
-          </a>
+          </BarWrap>
           <CoilMenu
             anchorOrigin={{
               vertical: 'top',
@@ -137,7 +142,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
             }}
             PaperProps={{
               style: {
-                transform: 'translateY(-16px) translateX(-18px)'
+                transform: 'translateY(-16px) translateX(30px)'
               }
             }}
             onClose={handleMenuClose}
