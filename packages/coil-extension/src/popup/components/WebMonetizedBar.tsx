@@ -19,21 +19,24 @@ const CoilBar = styled('div')({
   backgroundColor: Colors.White,
   height: '40px',
   textAlign: 'center',
-  position: 'relative'
+  position: 'relative',
+  cursor: 'pointer'
 })
 
 const BarBadge = styled('img')({
   position: 'relative',
   top: '0.20em',
   marginRight: '4px',
-  cursor: 'pointer'
+  height: '14px',
+  width: '13px'
 })
 
 const BarBlock = styled('img')({
   position: 'relative',
   top: '0.25em',
   marginRight: '3px',
-  cursor: 'pointer'
+  height: '14px',
+  width: '14px'
 })
 
 const CoilMenu = withStyles({
@@ -90,34 +93,27 @@ export const WebMonetizedBar = (props: PopupProps) => {
     return (
       <CoilBar>
         <Typography variant='caption'>
-          <a onClick={handleMenuClick}>
+          <a
+            onClick={handleMenuClick}
+            onMouseLeave={() => setHovered(false)}
+            onMouseEnter={() => setHovered(true)}
+          >
             {monetized && hovered ? (
-              <BarBlock
-                onMouseLeave={() => setHovered(false)}
-                style={{
-                  position: 'relative',
-                  top: '-1px',
-                  height: '14px',
-                  width: '13px'
-                }}
-                src='/res/block.svg'
-                width='14'
-                height='14'
-              />
+              <BarBlock src='/res/block.svg' width='14' height='14' />
             ) : (
               <BarBadge
-                onMouseEnter={() => setHovered(true)}
                 src={monetized ? '/res/dollar.svg' : '/res/nodollar.svg'}
                 width='13'
                 height='14'
               />
             )}
+
+            {adapted && monetized
+              ? ' Coil can donate to this channel'
+              : ' This ' + contentOrSite + ' is'}
+            {monetized ? '' : ' not'}
+            {monetized && adapted ? '' : ' Web-Monetized'}
           </a>
-          {adapted && monetized
-            ? ' Coil can donate to this channel'
-            : ' This ' + contentOrSite + ' is'}
-          {monetized ? '' : ' not'}
-          {monetized && adapted ? '' : ' Web-Monetized'}
           <CoilMenu
             anchorOrigin={{
               vertical: 'top',
@@ -126,6 +122,11 @@ export const WebMonetizedBar = (props: PopupProps) => {
             transformOrigin={{
               vertical: 'bottom',
               horizontal: 'left'
+            }}
+            PaperProps={{
+              style: {
+                transform: 'translateY(-16px) translateX(-18px)'
+              }
             }}
             onClose={handleMenuClose}
             open={Boolean(anchorEl)}
