@@ -4,6 +4,9 @@ import { styled } from '@material-ui/core'
 import Menu from '@material-ui/core/Menu'
 import withStyles from '@material-ui/core/styles/withStyles'
 import MenuItem from '@material-ui/core/MenuItem'
+import Switch from '@material-ui/core/Switch'
+import FormGroup from '@material-ui/core/FormGroup'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 
 import { Colors } from '../../shared-theme/colors'
 import { PopupProps } from '../types'
@@ -15,13 +18,22 @@ const CoilBar = styled('div')({
   borderTop: `0.5px solid ${Colors.Grey89}`,
   backgroundColor: Colors.White,
   height: '40px',
-  textAlign: 'center'
+  textAlign: 'center',
+  position: 'relative'
 })
 
 const BarBadge = styled('img')({
   position: 'relative',
-  top: '0.13em',
-  marginRight: '4px'
+  top: '0.20em',
+  marginRight: '4px',
+  cursor: 'pointer'
+})
+
+const BarBlock = styled('img')({
+  position: 'relative',
+  top: '0.25em',
+  marginRight: '3px',
+  cursor: 'pointer'
 })
 
 const CoilMenu = withStyles({
@@ -30,12 +42,38 @@ const CoilMenu = withStyles({
   }
 })(Menu)
 
+const BlockSwitch = withStyles({
+  switchBase: {
+    color: Colors.Grey89,
+    '&$checked': {
+      color: Colors.Green700
+    },
+    '&$checked + $track': {
+      backgroundColor: Colors.Green800
+    }
+  },
+  checked: {},
+  track: {}
+})(Switch)
+
 type ClickEvent = FormEvent<HTMLElement>
 
 export const WebMonetizedBar = (props: PopupProps) => {
   const { monetized, adapted, coilSite } = props.context.store
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [hovered, setHovered] = useState(false)
+  const [blockOptions, setBlockOptions] = useState({
+    option1: false,
+    option2: false,
+    option3: false
+  })
+
+  const handleBlockOptionsChange = (event: ClickEvent) => {
+    setBlockOptions({
+      ...blockOptions,
+      [event.target.name]: event.target.checked
+    })
+  }
   const handleMenuClick = (event: ClickEvent) => {
     setAnchorEl(event.currentTarget)
   }
@@ -64,7 +102,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
                 onMouseLeave={() => setHovered(false)}
                 onClick={handleMenuClick}
               >
-                🚫
+                <BarBlock src='/res/block.svg' width='14' height='14' />
               </a>
             </span>
           ) : (
@@ -80,24 +118,64 @@ export const WebMonetizedBar = (props: PopupProps) => {
             : ' This ' + contentOrSite + ' is'}
           {monetized ? '' : ' not'}
           {monetized && adapted ? '' : ' Web-Monetized'}
+          <CoilMenu
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left'
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left'
+            }}
+            onClose={handleMenuClose}
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            getContentAnchorEl={null}
+          >
+            <MenuItem dense divider component='a'>
+              <FormGroup row>
+                <FormControlLabel
+                  control={
+                    <BlockSwitch
+                      checked={blockOptions.option1}
+                      onChange={handleBlockOptionsChange}
+                      name='option1'
+                    />
+                  }
+                  label='Disable Domain'
+                />
+              </FormGroup>
+            </MenuItem>
+            <MenuItem dense divider>
+              <FormGroup row>
+                <FormControlLabel
+                  control={
+                    <BlockSwitch
+                      checked={blockOptions.option2}
+                      onChange={handleBlockOptionsChange}
+                      name='option2'
+                    />
+                  }
+                  label='Disable URL'
+                />
+              </FormGroup>
+            </MenuItem>
+            <MenuItem dense>
+              <FormGroup row>
+                <FormControlLabel
+                  control={
+                    <BlockSwitch
+                      checked={blockOptions.option3}
+                      onChange={handleBlockOptionsChange}
+                      name='option3'
+                    />
+                  }
+                  label='Disable Payment Pointer'
+                />
+              </FormGroup>
+            </MenuItem>
+          </CoilMenu>
         </Typography>
-        <CoilMenu
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left'
-          }}
-          onClose={handleMenuClose}
-          open={Boolean(anchorEl)}
-          anchorEl={anchorEl}
-        >
-          <MenuItem dense divider>
-            a
-          </MenuItem>
-          <MenuItem dense divider>
-            b
-          </MenuItem>
-          <MenuItem dense>c</MenuItem>
-        </CoilMenu>
       </CoilBar>
     )
   }
