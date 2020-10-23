@@ -79,10 +79,12 @@ export const WebMonetizedBar = (props: PopupProps) => {
   }
   const handleMenuClick = (event: ClickEvent) => {
     setAnchorEl(event.currentTarget)
+    setHovered(true)
   }
 
   const handleMenuClose = (event: ClickEvent) => {
     setAnchorEl(null)
+    setHovered(false)
   }
 
   if (coilSite && !monetized) {
@@ -91,14 +93,15 @@ export const WebMonetizedBar = (props: PopupProps) => {
     // TODO: adapted here should mean adaptable
     const contentOrSite = adapted ? 'content' : 'site'
     return (
-      <CoilBar>
+      <CoilBar
+        onMouseMove={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={() => setHovered(true)}
+      >
         <Typography variant='caption'>
-          <a
-            onClick={handleMenuClick}
-            onMouseLeave={() => setHovered(false)}
-            onMouseEnter={() => setHovered(true)}
-          >
-            {monetized && hovered ? (
+          <a onClick={handleMenuClick}>
+            {monetized &&
+            (hovered || Object.values(blockOptions).some(Boolean)) ? (
               <BarBlock src='/res/block.svg' width='14' height='14' />
             ) : (
               <BarBadge
