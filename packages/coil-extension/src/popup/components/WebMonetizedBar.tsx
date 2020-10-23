@@ -25,14 +25,14 @@ const CoilBar = styled('div')({
 
 const BarBadge = styled('img')({
   position: 'relative',
-  marginRight: '4px',
+  marginRight: '8px',
   height: '14px',
   width: '13px'
 })
 
 const BarBlock = styled('img')({
   position: 'relative',
-  marginRight: '3px',
+  marginRight: '7px',
   height: '14px',
   width: '14px'
 })
@@ -41,7 +41,8 @@ const BarWrap = styled('a')({
   display: 'flex',
   flex: 1,
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+  height: '100%'
 })
 
 const CoilMenu = withStyles({
@@ -49,6 +50,12 @@ const CoilMenu = withStyles({
     minWidth: '113px'
   }
 })(Menu)
+
+const MonitizedState = withStyles({
+  root: {
+    height: '100%'
+  }
+})(Typography)
 
 const BlockSwitch = withStyles({
   switchBase: {
@@ -112,7 +119,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
         onMouseLeave={() => setHovered(false)}
         onMouseEnter={() => setHovered(true)}
       >
-        <Typography variant='caption'>
+        <MonitizedState variant='caption'>
           <BarWrap onClick={handleMenuClick}>
             {monetized &&
             (hovered || Object.values(blockOptions).some(Boolean)) ? (
@@ -142,7 +149,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
             }}
             PaperProps={{
               style: {
-                transform: 'translateY(-16px) translateX(30px)'
+                transform: 'translateX(30px)'
               }
             }}
             onClose={handleMenuClose}
@@ -193,7 +200,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
               </FormGroup>
             </MenuItem>
           </CoilMenu>
-        </Typography>
+        </MonitizedState>
       </CoilBar>
     )
   }
