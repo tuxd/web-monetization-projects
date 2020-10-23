@@ -61,15 +61,24 @@ const BlockSwitch = withStyles({
 
 type ClickEvent = FormEvent<HTMLElement>
 
+interface Form {
+  disableDomain: boolean
+  disablePaymentPointer: boolean
+  disableUrl: boolean
+}
+
 export const WebMonetizedBar = (props: PopupProps) => {
   const { monetized, adapted, coilSite } = props.context.store
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [hovered, setHovered] = useState(false)
-  const [blockOptions, setBlockOptions] = useState({
-    option1: false,
-    option2: false,
-    option3: false
-  })
+
+  const defaultState: Form = {
+    disableDomain: false,
+    disableUrl: false,
+    disablePaymentPointer: false
+  }
+
+  const [blockOptions, setBlockOptions] = useState(defaultState)
 
   const handleBlockOptionsChange = (event: FormEvent<HTMLInputElement>) => {
     setBlockOptions({
@@ -141,9 +150,9 @@ export const WebMonetizedBar = (props: PopupProps) => {
                 <FormControlLabel
                   control={
                     <BlockSwitch
-                      checked={blockOptions.option1}
+                      checked={blockOptions.disableDomain}
                       onChange={handleBlockOptionsChange}
-                      name='option1'
+                      name='disableDomain'
                     />
                   }
                   label='Disable Domain'
@@ -155,9 +164,9 @@ export const WebMonetizedBar = (props: PopupProps) => {
                 <FormControlLabel
                   control={
                     <BlockSwitch
-                      checked={blockOptions.option2}
+                      checked={blockOptions.disableUrl}
                       onChange={handleBlockOptionsChange}
-                      name='option2'
+                      name='disableUrl'
                     />
                   }
                   label='Disable URL'
@@ -169,9 +178,9 @@ export const WebMonetizedBar = (props: PopupProps) => {
                 <FormControlLabel
                   control={
                     <BlockSwitch
-                      checked={blockOptions.option3}
+                      checked={blockOptions.disablePaymentPointer}
                       onChange={handleBlockOptionsChange}
-                      name='option3'
+                      name='disablePaymentPointer'
                     />
                   }
                   label='Disable Payment Pointer'
