@@ -110,6 +110,12 @@ export class TabStates {
         })
         break
 
+      case 'disabled':
+        this.set(tab, {
+          badge: { text: '🚫', color: Colors.BlackDisabledBackground }
+        })
+        break
+
       case 'unavailable':
         this.set(tab, {
           badge: { text: '!', color: Colors.Red }

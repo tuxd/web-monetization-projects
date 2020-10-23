@@ -196,6 +196,7 @@ export type IconState =
   | 'inactive'
   | 'monetized'
   | 'streaming'
+  | 'disabled'
 
 export interface AdaptedSite {
   command: 'adaptedSite'
