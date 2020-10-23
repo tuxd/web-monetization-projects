@@ -68,10 +68,10 @@ export const WebMonetizedBar = (props: PopupProps) => {
     option3: false
   })
 
-  const handleBlockOptionsChange = (event: ClickEvent) => {
+  const handleBlockOptionsChange = (event: FormEvent<HTMLInputElement>) => {
     setBlockOptions({
       ...blockOptions,
-      [event.target.name]: event.target.checked
+      [event.currentTarget.name]: event.currentTarget.checked
     })
   }
   const handleMenuClick = (event: ClickEvent) => {
@@ -90,29 +90,29 @@ export const WebMonetizedBar = (props: PopupProps) => {
     return (
       <CoilBar>
         <Typography variant='caption'>
-          {monetized && hovered ? (
-            <span>
-              <a
+          <a onClick={handleMenuClick}>
+            {monetized && hovered ? (
+              <BarBlock
+                onMouseLeave={() => setHovered(false)}
                 style={{
                   position: 'relative',
                   top: '-1px',
                   height: '14px',
                   width: '13px'
                 }}
-                onMouseLeave={() => setHovered(false)}
-                onClick={handleMenuClick}
-              >
-                <BarBlock src='/res/block.svg' width='14' height='14' />
-              </a>
-            </span>
-          ) : (
-            <BarBadge
-              onMouseEnter={() => setHovered(true)}
-              src='/res/dollar.svg'
-              width='13'
-              height='14'
-            />
-          )}
+                src='/res/block.svg'
+                width='14'
+                height='14'
+              />
+            ) : (
+              <BarBadge
+                onMouseEnter={() => setHovered(true)}
+                src={monetized ? '/res/dollar.svg' : '/res/nodollar.svg'}
+                width='13'
+                height='14'
+              />
+            )}
+          </a>
           {adapted && monetized
             ? ' Coil can donate to this channel'
             : ' This ' + contentOrSite + ' is'}
@@ -120,7 +120,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
           {monetized && adapted ? '' : ' Web-Monetized'}
           <CoilMenu
             anchorOrigin={{
-              vertical: 'bottom',
+              vertical: 'top',
               horizontal: 'left'
             }}
             transformOrigin={{
