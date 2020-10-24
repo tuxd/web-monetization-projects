@@ -11,6 +11,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { Colors } from '../../shared-theme/colors'
 import { PopupProps } from '../types'
 import { DisablingControls } from '../../types/disabling'
+import { SetDisabling } from '../../types/commands'
 
 import { useStorage } from './util/useStorage'
 
@@ -77,7 +78,7 @@ const BlockSwitch = withStyles({
 type ClickEvent = FormEvent<HTMLElement>
 
 export const WebMonetizedBar = (props: PopupProps) => {
-  const { monetized, adapted, coilSite } = props.context.store
+  const { monetized, adapted, coilSite, validToken } = props.context.store
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [hovered, setHovered] = useState(false)
 
@@ -91,10 +92,16 @@ export const WebMonetizedBar = (props: PopupProps) => {
   )
 
   const handleBlockOptionsChange = (event: FormEvent<HTMLInputElement>) => {
-    setBlockOptions({
+    const updated: DisablingControls = {
       ...blockOptions,
       [event.currentTarget.name]: event.currentTarget.checked
-    })
+    }
+    setBlockOptions(updated)
+    const msg: SetDisabling = {
+      command: 'setDisabling',
+      data: updated
+    }
+    props.context.runtime.sendMessage(msg)
   }
 
   const handleMenuClick = (event: ClickEvent) => {
@@ -112,6 +119,8 @@ export const WebMonetizedBar = (props: PopupProps) => {
   } else {
     // TODO: adapted here should mean adaptable
     const contentOrSite = adapted ? 'content' : 'site'
+    const showDisable =
+      validToken && (hovered || Object.values(blockOptions).some(Boolean))
     return (
       <CoilBar
         onMouseMove={() => setHovered(true)}
@@ -119,8 +128,14 @@ export const WebMonetizedBar = (props: PopupProps) => {
         onMouseEnter={() => setHovered(true)}
       >
         <MonitizedState variant='caption'>
-          <BarWrap onClick={handleMenuClick}>
-            {hovered || Object.values(blockOptions).some(Boolean) ? (
+          <BarWrap
+            onClick={event => {
+              if (showDisable) {
+                handleMenuClick(event)
+              }
+            }}
+          >
+            {showDisable ? (
               <BarBlock src='/res/block.svg' width='14' height='14' />
             ) : (
               <BarBadge

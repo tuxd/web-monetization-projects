@@ -19,6 +19,7 @@ import {
   ReportCorrelationIdFromIFrameContentScript,
   ReportCorrelationIdToParentContentScript,
   ResumeWebMonetization,
+  SetDisabling,
   SetMonetizationState,
   SetStreamControls,
   StartWebMonetization,
@@ -60,10 +61,8 @@ export class BackgroundScript {
     private auth: AuthService,
     private youtube: YoutubeService,
     private framesService: BackgroundFramesService,
-
     @logger('BackgroundScript')
     private log: Logger,
-
     private client: GraphQlClient,
     @inject(tokens.CoilDomain)
     private coilDomain: string,
@@ -321,6 +320,8 @@ export class BackgroundScript {
         const frameStates = Object.values(tabState.frameStates)
         const hasStream = frameStates.find(f => f.monetized)
         const hasBeenPaid = hasStream && frameStates.find(f => f.total > 0)
+        const disabled =
+          tabState.disabling && Object.values(tabState.disabling).some(Boolean)
 
         if (hasStream) {
           this.tabStates.setIcon(tabId, 'monetized')
@@ -330,6 +331,9 @@ export class BackgroundScript {
                 ? 'streaming'
                 : 'streaming-paused'
             this.tabStates.setIcon(tabId, state)
+          }
+          if (disabled) {
+            this.tabStates.setIcon(tabId, 'disabled')
           }
         } else {
           this.tabStates.setIcon(tabId, 'inactive')
@@ -348,6 +352,9 @@ export class BackgroundScript {
       case 'log':
         this.log('log command:', request.data)
         sendResponse(true)
+        break
+      case 'setDisabling':
+        sendResponse(this.setDisabling(request, sender))
         break
       case 'logout':
         sendResponse(this.logout(sender))
@@ -533,6 +540,12 @@ export class BackgroundScript {
     } else if (state) {
       delete this.store.playState
       delete this.store.stickyState
+    }
+
+    this.store.disabling = state?.disabling ?? {
+      disableDomain: false,
+      disablePaymentPointer: false,
+      disableUrl: false
     }
 
     if (state) {
@@ -937,5 +950,13 @@ export class BackgroundScript {
       const tabId = request.data.frame.tabId
       this.api.tabs.sendMessage(tabId, request, { frameId })
     })
+  }
+
+  private setDisabling(request: SetDisabling, sender: MessageSender) {
+    const tabId = this.activeTab
+    const currentUrl = this.framesService.getFrame({ frameId: 0, tabId })?.href
+    console.log('SET_DISABLING', { currentUrl })
+    this.tabStates.set(tabId, { disabling: request.data })
+    this.reloadTabState({ from: 'setDisabling' })
   }
 }

@@ -1,4 +1,5 @@
 import { PlayOrPauseState, StickyState } from './streamControls'
+import { DisablingControls } from './disabling'
 
 export type MonetizationCommand = 'pause' | 'stop' | 'start' | 'resume'
 
@@ -16,6 +17,7 @@ export interface FrameState {
 export interface TabState {
   favicon?: string
   coilSite?: string
+  disabling?: DisablingControls
   stickyState: StickyState
   playState: PlayOrPauseState
   icon?: {
