@@ -10,6 +10,9 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 
 import { Colors } from '../../shared-theme/colors'
 import { PopupProps } from '../types'
+import { DisablingControls } from '../../types/disabling'
+
+import { useStorage } from './util/useStorage'
 
 const CoilBar = styled('div')({
   display: 'flex',
@@ -73,24 +76,19 @@ const BlockSwitch = withStyles({
 
 type ClickEvent = FormEvent<HTMLElement>
 
-interface Form {
-  disableDomain: boolean
-  disablePaymentPointer: boolean
-  disableUrl: boolean
-}
-
 export const WebMonetizedBar = (props: PopupProps) => {
   const { monetized, adapted, coilSite } = props.context.store
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [hovered, setHovered] = useState(false)
 
-  const defaultState: Form = {
-    disableDomain: false,
-    disableUrl: false,
-    disablePaymentPointer: false
-  }
-
-  const [blockOptions, setBlockOptions] = useState(defaultState)
+  const [blockOptions, setBlockOptions] = useStorage<DisablingControls>(
+    'disabling',
+    {
+      disableDomain: false,
+      disableUrl: false,
+      disablePaymentPointer: false
+    }
+  )
 
   const handleBlockOptionsChange = (event: FormEvent<HTMLInputElement>) => {
     setBlockOptions({
@@ -98,6 +96,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
       [event.currentTarget.name]: event.currentTarget.checked
     })
   }
+
   const handleMenuClick = (event: ClickEvent) => {
     setAnchorEl(event.currentTarget)
     setHovered(true)
@@ -121,8 +120,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
       >
         <MonitizedState variant='caption'>
           <BarWrap onClick={handleMenuClick}>
-            {monetized &&
-            (hovered || Object.values(blockOptions).some(Boolean)) ? (
+            {hovered || Object.values(blockOptions).some(Boolean) ? (
               <BarBlock src='/res/block.svg' width='14' height='14' />
             ) : (
               <BarBadge
@@ -157,7 +155,7 @@ export const WebMonetizedBar = (props: PopupProps) => {
             anchorEl={anchorEl}
             getContentAnchorEl={null}
           >
-            <MenuItem dense divider component='a'>
+            <MenuItem dense divider>
               <FormGroup row>
                 <FormControlLabel
                   control={
