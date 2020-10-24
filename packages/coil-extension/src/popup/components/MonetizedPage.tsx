@@ -46,6 +46,7 @@ export function MonetizedPage(props: PopupProps) {
     )
   }, [])
   const context = props.context
+  const disabled = Object.values(props.context.store.disabling).some(Boolean)
   return (
     <>
       <Grid container alignItems='center' justify='center'>
@@ -55,10 +56,12 @@ export function MonetizedPage(props: PopupProps) {
               context={context}
               limitRefreshDate={limitRefreshDate}
             />
-          ) : (
+          ) : !disabled ? (
             <div onClick={onClick}>
               <Donating context={context} />
             </div>
+          ) : (
+            <Disabled context={context}></Disabled>
           )}
         </div>
       </Grid>
@@ -90,6 +93,38 @@ function Donating(props: PopupProps) {
         <MonetizeAnimation context={props.context} />
       </FlexBox>
     </Fragment>
+  )
+}
+
+function Disabled(props: PopupProps) {
+  let reason = ''
+  const disabling = props.context.store.disabling
+  if (disabling.disablePaymentPointer) {
+    reason = 'This payment pointer is disabled'
+  }
+  if (disabling.disableUrl) {
+    reason = 'This url is disabled'
+  }
+  if (disabling.disableDomain) {
+    reason = 'This domain is disabled'
+  }
+  return (
+    <div style={{ height: '160px' }}>
+      <StatusTypography variant='h6' align='center'>
+        Monetization Disabled
+      </StatusTypography>
+      <StatusTypography variant='subtitle1' align='center'>
+        {reason}
+      </StatusTypography>
+      <FlexBox>
+        <img
+          src={'/res/stream_inactive.svg'}
+          alt='animation'
+          width='171'
+          height='22'
+        />
+      </FlexBox>
+    </div>
   )
 }
 
