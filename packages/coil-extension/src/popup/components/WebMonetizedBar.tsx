@@ -52,6 +52,25 @@ const BarWrap = styled('a')({
 const CoilMenu = withStyles({
   paper: {
     minWidth: '113px'
+  },
+  list: {
+    '& a': {
+      paddingRight: 0
+    },
+    '& li': {
+      paddingRight: 0,
+      '& div': {
+        width: '100%',
+        paddingRight: 0,
+        '& label': {
+          width: 'calc(100% + 11px)',
+          marginRight: 0,
+          '& span:nth-child(2)': {
+            paddingRight: '16px'
+          }
+        }
+      }
+    }
   }
 })(Menu)
 
