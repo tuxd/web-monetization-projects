@@ -46,7 +46,9 @@ export function MonetizedPage(props: PopupProps) {
     )
   }, [])
   const context = props.context
-  const disabled = Object.values(props.context.store.disabling).some(Boolean)
+  const disabled = Object.values(props.context.store.disabling ?? {}).some(
+    Boolean
+  )
   return (
     <>
       <Grid container alignItems='center' justify='center'>
