@@ -138,8 +138,8 @@ export const WebMonetizedBar = (props: PopupProps) => {
   } else {
     // TODO: adapted here should mean adaptable
     const contentOrSite = adapted ? 'content' : 'site'
-    const showDisable =
-      validToken && (hovered || Object.values(blockOptions).some(Boolean))
+    const disabled = Object.values(blockOptions).some(Boolean)
+    const showDisable = validToken && (hovered || disabled)
     return (
       <CoilBar
         onMouseMove={() => setHovered(true)}
@@ -154,8 +154,11 @@ export const WebMonetizedBar = (props: PopupProps) => {
               }
             }}
           >
-            {showDisable ? (
+            {/* eslint-disable-next-line no-nested-ternary */}
+            {disabled ? (
               <BarBlock src='/res/block.svg' width='14' height='14' />
+            ) : hovered ? (
+              <BarBlock src='/res/block-preview.svg' />
             ) : (
               <BarBadge
                 src={monetized ? '/res/dollar.svg' : '/res/nodollar.svg'}
