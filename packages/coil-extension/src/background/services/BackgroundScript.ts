@@ -30,6 +30,7 @@ import { LocalStorageProxy } from '../../types/storage'
 import { TabState } from '../../types/TabState'
 import { getFrameSpec, getTab } from '../../util/tabs'
 import { FrameSpec } from '../../types/FrameSpec'
+import { BuildConfig } from '../../types/BuildConfig'
 
 import { StreamMoneyEvent } from './Stream'
 import { AuthService } from './AuthService'
@@ -43,9 +44,6 @@ import { BackgroundFramesService } from './BackgroundFramesService'
 import { StreamAssociations } from './StreamAssociations'
 
 import MessageSender = chrome.runtime.MessageSender
-
-import { BuildConfig } from '../../types/BuildConfig'
-import { debug } from '../../content/util/logging'
 
 @injectable()
 export class BackgroundScript {
@@ -235,6 +233,8 @@ export class BackgroundScript {
           this.setCoilUrlForPopupIfNeeded(tabId, url)
         }
         const from = `onFrameChanged directly, event=${JSON.stringify(event)}, `
+        // Only extension apis can get callbacks for url change events
+        // consistently so we report the url changes to the content script.
         const message: CheckAdaptedContent = {
           command: 'checkAdaptedContent',
           data: { from }
@@ -320,17 +320,17 @@ export class BackgroundScript {
         const frameStates = Object.values(tabState.frameStates)
         const hasStream = frameStates.find(f => f.monetized)
         const hasBeenPaid = hasStream && frameStates.find(f => f.total > 0)
+        const paused = tabState.playState === 'paused'
         const disabled =
           tabState.disabling && Object.values(tabState.disabling).some(Boolean)
 
         if (hasStream) {
           this.tabStates.setIcon(tabId, 'monetized')
           if (hasBeenPaid) {
-            const state =
-              tabState.playState === 'playing'
-                ? 'streaming'
-                : 'streaming-paused'
-            this.tabStates.setIcon(tabId, state)
+            this.tabStates.setIcon(tabId, 'streaming')
+          }
+          if (paused) {
+            this.tabStates.setIcon(tabId, 'streaming-paused')
           }
           if (disabled) {
             this.tabStates.setIcon(tabId, 'disabled')
@@ -629,6 +629,10 @@ export class BackgroundScript {
     const { tabId, frameId } = frame
 
     this.tabStates.logLastMonetizationCommand(frame, 'start')
+    if (this.tabStates.get(frame.tabId).playState === 'paused') {
+      this.tabStates.logLastMonetizationCommand(frame, 'pause')
+    }
+
     // This used to be sent from content script as a separate message
     this.mayMonetizeSite(sender, request.data.initiatingUrl)
 

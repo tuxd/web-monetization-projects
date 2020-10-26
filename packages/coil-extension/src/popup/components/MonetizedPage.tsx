@@ -76,12 +76,16 @@ export function MonetizedPage(props: PopupProps) {
 }
 
 function Donating(props: PopupProps) {
-  const { monetizedTotal, adapted } = props.context.store
+  const { monetizedTotal, adapted, playState } = props.context.store
   const paymentStarted = monetizedTotal !== 0
   const emptyWhenNotAdapted = adapted ? 'Coil is paying the creator.' : ''
-  const payingOrSettingUpPayment = paymentStarted
-    ? emptyWhenNotAdapted
-    : 'Setting up payment.'
+  const payingOrSettingUpPayment =
+    // eslint-disable-next-line no-nested-ternary
+    playState === 'paused'
+      ? ''
+      : paymentStarted
+      ? emptyWhenNotAdapted
+      : 'Setting up payment.'
 
   return (
     <Fragment>
