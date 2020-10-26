@@ -15,10 +15,13 @@ export class DisablingService {
   ) {}
 
   /**
-   * @return true if frame needs disabling
+   * @return `true` if frame's stream needs disabling,
+   *         `false` if frame's stream potentially needs enabling
    */
-  updateUrlForFrame(frame: FrameSpec): boolean {
-    return false
+  updateUrlForFrame(frame: FrameSpec, url: string): boolean {
+    const urlObject = new URL(url)
+    const { href, origin } = urlObject
+    return this.disabled[href] || this.disabled[origin]
   }
 
   isDisabled(
