@@ -17,6 +17,7 @@ import { withSharedTheme } from '../shared-theme/withSharedTheme'
 import { parseAmount } from '../util/currencyFormatting'
 
 import { PageHistory } from './pageHistory'
+import { PageDisabledList } from './pageDisabledList'
 
 export interface PageTotal {
   total: Amount
@@ -157,7 +158,26 @@ function Options() {
   return (
     <Grid container justify='center' alignItems='center'>
       <MainPanel>
-        <Grid item xs={12}>
+        <Typography variant='h1' align='left'>
+          Disabled List
+        </Typography>
+        <PageDisabledList></PageDisabledList>
+      </MainPanel>
+    </Grid>
+  )
+}
+
+const IndexWithRoot = withSharedTheme(Options)
+
+function main() {
+  const rootEl = document.getElementById('root')
+  ReactDOM.render(<IndexWithRoot />, rootEl)
+}
+
+main()
+
+/*
+<Grid item xs={12}>
           <Typography variant='h1' align='left'>
             Privacy
           </Typography>
@@ -211,16 +231,4 @@ function Options() {
             totals={totals}
           />
         </Grid>
-      </MainPanel>
-    </Grid>
-  )
-}
-
-const IndexWithRoot = withSharedTheme(Options)
-
-function main() {
-  const rootEl = document.getElementById('root')
-  ReactDOM.render(<IndexWithRoot />, rootEl)
-}
-
-main()
+ */
