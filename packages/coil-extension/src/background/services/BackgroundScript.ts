@@ -41,6 +41,7 @@ import { PopupBrowserAction } from './PopupBrowserAction'
 import { Logger, logger } from './utils'
 import { YoutubeService } from './YoutubeService'
 import { BackgroundFramesService } from './BackgroundFramesService'
+import { DisablingService } from './DisablingService'
 import { StreamAssociations } from './StreamAssociations'
 
 import MessageSender = chrome.runtime.MessageSender
@@ -62,6 +63,7 @@ export class BackgroundScript {
     @logger('BackgroundScript')
     private log: Logger,
     private client: GraphQlClient,
+    private disabling: DisablingService,
     @inject(tokens.CoilDomain)
     private coilDomain: string,
     @inject(tokens.BuildConfig)
@@ -212,20 +214,24 @@ export class BackgroundScript {
   private setFramesOnChangedListener() {
     // Reset tab state and recheck adapted content when tab changes location
     this.framesService.on('frameChanged', event => {
+      // If not a top level window or its direct descendant, bail early
       if (!(event.frame.top || event.frame.parentFrameId === 0)) {
         return
       }
 
-      const { tabId } = event
-      const status = event.changed.state
+      const { tabId, frameId } = event
+      const changedState = event.changed.state
       const isComplete = event.frame.state === 'complete'
-      const becameComplete = status === 'complete'
+      const becameComplete = changedState === 'complete'
+      const becameLoading = changedState === 'loading'
       const changedUrl = Boolean(event.changed.href)
 
-      // Always get the url from the tab
+      // Always get the current url
       const url = event.frame.href
-      if (status === 'loading' && event.frame.top) {
-        this.setCoilUrlForPopupIfNeeded(tabId, url)
+      if (becameLoading) {
+        if (event.frame.top) {
+          this.setCoilUrlForPopupIfNeeded(tabId, url)
+        }
       }
 
       if (becameComplete || (isComplete && changedUrl)) {
@@ -233,23 +239,22 @@ export class BackgroundScript {
           this.setCoilUrlForPopupIfNeeded(tabId, url)
         }
         const from = `onFrameChanged directly, event=${JSON.stringify(event)}, `
-        // Only extension apis can get callbacks for url change events
-        // consistently so we report the url changes to the content script.
-        const message: CheckAdaptedContent = {
-          command: 'checkAdaptedContent',
-          data: { from }
-        }
-        this.log('sending checkAdaptedContent message', message)
-        this.api.tabs.sendMessage(
-          tabId,
-          message,
-          { frameId: event.frameId },
-          () => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const ignored = this.api.runtime.lastError
-          }
-        )
+        this.checkAdaptedContent(from, tabId, frameId)
       }
+    })
+  }
+
+  private checkAdaptedContent(from: string, tabId: number, frameId: number) {
+    // Only extension apis can get callbacks for url change events
+    // consistently so we report the url changes to the content script.
+    const message: CheckAdaptedContent = {
+      command: 'checkAdaptedContent',
+      data: { from }
+    }
+    this.log('sending checkAdaptedContent message', message)
+    this.api.tabs.sendMessage(tabId, message, { frameId }, () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const ignored = this.api.runtime.lastError
     })
   }
 
