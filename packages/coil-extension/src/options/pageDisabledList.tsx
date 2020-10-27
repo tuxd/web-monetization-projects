@@ -12,8 +12,8 @@ import CloseIcon from '@material-ui/icons/Close'
 
 import { Colors } from '../shared-theme/colors'
 
-import { Stream } from './options'
 import { STREAMS } from './streams'
+import { BlockConfig } from './interfaces'
 
 // styles for responsiveness
 const useStyles = makeStyles(theme => {
@@ -122,17 +122,17 @@ const ButtonDelete = styled(Button)({
 })
 
 const StreamList = (props: {
-  streams: Stream[]
-  removeStream: (arg0: number) => any
+  blockConfigs: BlockConfig[]
+  removeBlock: (ix: number) => void
 }) => {
-  const { streams, removeStream } = props
+  const { blockConfigs, removeBlock } = props
   const classes = useStyles()
-  console.log(streams)
+
   return (
     <>
-      {streams &&
-        streams.map((stream: Stream, i: number) => (
-          <Row key={'stream' + i}>
+      {blockConfigs &&
+        blockConfigs.map((config: BlockConfig, i: number) => (
+          <Row key={`stream${i}`}>
             <Grid
               container
               direction='row'
@@ -148,12 +148,12 @@ const StreamList = (props: {
                     <Favicon
                       className={classes.favicon}
                       width='16'
-                      src={stream.favIcon ? stream.favIcon : '../res/pp.svg'}
+                      src={config.favIcon ? config.favIcon : '../res/pp.svg'}
                     />
                   </Grid>
                   <Grid item>
                     <Typography variant='h4' className={classes.domainH4}>
-                      <Link href={stream.value}>{stream.value}</Link>
+                      <Link href={config.value}>{config.value}</Link>
                     </Typography>
                   </Grid>
                 </DomainRow>
@@ -166,7 +166,7 @@ const StreamList = (props: {
                   alignItems='center'
                   direction='row'
                 >
-                  {stream.type}
+                  {config.type}
                 </Grid>
               </Grid>
 
@@ -179,7 +179,7 @@ const StreamList = (props: {
                 >
                   <Grid item xs={6} sm={12}>
                     <div className={classes.centerElement}>
-                      <ButtonDelete onClick={() => removeStream(i)}>
+                      <ButtonDelete onClick={() => removeBlock(i)}>
                         <CloseIcon />
                       </ButtonDelete>
                     </div>
@@ -194,7 +194,7 @@ const StreamList = (props: {
 }
 
 export const PageDisabledList = () => {
-  const [streams, setStreams] = useState<Stream[]>(STREAMS)
+  const [streams, setStreams] = useState<BlockConfig[]>(STREAMS)
 
   const removeStream = (i: number) => {
     const newStreams = streams
@@ -203,5 +203,5 @@ export const PageDisabledList = () => {
     console.log('streams', newStreams)
   }
 
-  return <StreamList streams={streams} removeStream={removeStream} />
+  return <StreamList blockConfigs={streams} removeBlock={removeStream} />
 }

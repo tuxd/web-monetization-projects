@@ -1,6 +1,6 @@
-import { Stream } from './options'
+import { BlockConfig } from './interfaces'
 
-export const STREAMS: Stream[] = [
+export const STREAMS: BlockConfig[] = [
   {
     type: 'Domain',
     value: 'https://www.google.com',
