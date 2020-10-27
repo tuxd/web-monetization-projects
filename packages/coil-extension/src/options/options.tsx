@@ -33,8 +33,8 @@ export interface PageTotal {
 }
 
 export interface Stream {
-  type: 'URL' | 'Domain' | 'Payment Pointer',
-  value: string,
+  type: 'URL' | 'Domain' | 'Payment Pointer'
+  value: string
   favIcon?: string
 }
 
