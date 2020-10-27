@@ -32,6 +32,12 @@ export interface PageTotal {
   }
 }
 
+export interface Stream {
+  type: 'URL' | 'Domain' | 'Payment Pointer',
+  value: string,
+  favIcon?: string
+}
+
 function makeKey(url: string, paymentPointer: string): PageTotal['key'] {
   return {
     url,
