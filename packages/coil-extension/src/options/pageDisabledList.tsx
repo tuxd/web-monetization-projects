@@ -1,16 +1,17 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import {
-  Grid,
   Button,
-  Typography,
-  styled,
+  Grid,
+  Link,
   makeStyles,
+  styled,
   SvgIcon,
-  Link
+  Typography
 } from '@material-ui/core'
+import CloseIcon from '@material-ui/icons/Close'
 
-import CloseIcon from '@material-ui/icons/Close';
 import { Colors } from '../shared-theme/colors'
+
 import { Stream } from './options'
 import { STREAMS } from './streams'
 
@@ -34,7 +35,7 @@ const useStyles = makeStyles(theme => {
       '& .MuiLink-underlineHover': {
         color: 'inherit',
         textDecoration: 'none',
-        transition: 'color 0.2s ease-in-out',
+        transition: 'color 0.2s ease-in-out'
       },
       '&:hover': {
         color: Colors.Grey700
@@ -103,96 +104,104 @@ const ButtonDelete = styled(Button)({
   transition: 'all 0.2s ease-in-out',
   '&.MuiButton-root': {
     minWidth: 'auto !important',
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-end'
   },
   '& svg path': {
-    transition: 'fill 0.2s ease-in-out',
+    transition: 'fill 0.2s ease-in-out'
   },
   '&:hover': {
-      '& svg path': {
-        fill: Colors.Red700
-      },
-    background: Colors.Grey50,
+    '& svg path': {
+      fill: Colors.Red700
     },
+    background: Colors.Grey50
+  },
   alignSelf: 'flex-end',
   '& .MuiButton-label': {
-    transition: 'fill 0.2s ease-in-out',
+    transition: 'fill 0.2s ease-in-out'
   }
 })
 
-const StreamList = (streams: Stream[], removeStream: (arg0: number) => any) => {
-
+const StreamList = (props: {
+  streams: Stream[]
+  removeStream: (arg0: number) => any
+}) => {
+  const { streams, removeStream } = props
   const classes = useStyles()
   console.log(streams)
-
-    return (
-      <>
-      {streams && (
-      streams.map((stream: Stream, i: number) =>
-        <Row key={'stream' + i}>
-          <Grid container direction='row' className={classes.disabledListItem}>
-            <Grid item xs={12} sm={6}>
-              <DomainRow container direction='row' className={classes.domainRow}>
-                <Grid item>
-                  <Favicon
-                    className={classes.favicon}
-                    width='16'
-                    src={stream.favIcon ? stream.favIcon : '../res/pp.svg'}
-                  />
-                </Grid>
-                <Grid item>
-                  <Typography variant='h4' className={classes.domainH4}>
-                    <Link href={stream.value}>{stream.value}</Link>
-                  </Typography>
-                </Grid>
-              </DomainRow>
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <Grid
-                container
-                justify='flex-start'
-                alignItems='center'
-                direction='row'
-              >
-                {stream.type}
+  return (
+    <>
+      {streams &&
+        streams.map((stream: Stream, i: number) => (
+          <Row key={'stream' + i}>
+            <Grid
+              container
+              direction='row'
+              className={classes.disabledListItem}
+            >
+              <Grid item xs={12} sm={6}>
+                <DomainRow
+                  container
+                  direction='row'
+                  className={classes.domainRow}
+                >
+                  <Grid item>
+                    <Favicon
+                      className={classes.favicon}
+                      width='16'
+                      src={stream.favIcon ? stream.favIcon : '../res/pp.svg'}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant='h4' className={classes.domainH4}>
+                      <Link href={stream.value}>{stream.value}</Link>
+                    </Typography>
+                  </Grid>
+                </DomainRow>
               </Grid>
-            </Grid>
 
-            <Grid item xs={12} sm={2}>
-              <Grid
-                container
-                justify='center'
-                alignItems='center'
-                direction='row'
-              >
-                <Grid item xs={6} sm={12}>
-                  <div className={classes.centerElement}>
-                    <ButtonDelete onClick={() => removeStream(i)}>
-                      <CloseIcon/>
-                    </ButtonDelete>
-                  </div>
+              <Grid item xs={12} sm={4}>
+                <Grid
+                  container
+                  justify='flex-start'
+                  alignItems='center'
+                  direction='row'
+                >
+                  {stream.type}
                 </Grid>
               </Grid>
+
+              <Grid item xs={12} sm={2}>
+                <Grid
+                  container
+                  justify='center'
+                  alignItems='center'
+                  direction='row'
+                >
+                  <Grid item xs={6} sm={12}>
+                    <div className={classes.centerElement}>
+                      <ButtonDelete onClick={() => removeStream(i)}>
+                        <CloseIcon />
+                      </ButtonDelete>
+                    </div>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Grid>
-          </Grid>
-        </Row>
-      ))}
-      </>
-    )
+          </Row>
+        ))}
+    </>
+  )
 }
 
 export const PageDisabledList = () => {
-
-  const [streams, setStreams] = useState(STREAMS)
+  const [streams, setStreams] = useState<Stream[]>(STREAMS)
 
   const removeStream = (i: number) => {
     const newStreams = streams
     newStreams.splice(i, 1)
     setStreams(newStreams)
-    console.log("streams", newStreams)
+    console.log('streams', newStreams)
   }
 
-  // @ts-ignore
   return <StreamList streams={streams} removeStream={removeStream} />
 }
