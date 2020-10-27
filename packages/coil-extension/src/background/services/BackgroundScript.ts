@@ -787,7 +787,13 @@ export class BackgroundScript {
     this.tabStates.logLastMonetizationCommand(frame, 'resume')
 
     const id = this.assoc.getStreamId(frame)
-    if (id) {
+    if (
+      id &&
+      !this.disabling.isDisabled(
+        frame,
+        this.streams.getStream(id).getPaymentPointer()
+      )
+    ) {
       this.log('resuming stream', id)
       this.sendSetMonetizationStateMessage(frame, 'pending')
       this.streams.resumeStream(id)
