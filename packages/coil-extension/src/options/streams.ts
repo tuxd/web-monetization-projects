@@ -28,5 +28,10 @@ export const STREAMS: BlockConfig[] = [
   {
     type: 'Payment Pointer',
     value: '$coil.xrptipbot.com/tJBD0R0GF1uvUAF7_oyrwq'
+  },
+  {
+    type: 'Domain',
+    value: 'https://www.fakingtonfakeurlnotrealtest.com',
+    favIcon: 'https://www.fakingtonfakeurlnotrealtest123123.com/favicon.ico'
   }
 ]

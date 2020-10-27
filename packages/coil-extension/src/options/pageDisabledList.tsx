@@ -5,7 +5,6 @@ import {
   Link,
   makeStyles,
   styled,
-  SvgIcon,
   Typography
 } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
@@ -14,6 +13,7 @@ import { Colors } from '../shared-theme/colors'
 
 import { STREAMS } from './streams'
 import { BlockConfig } from './interfaces'
+import { FaviconLoader } from './faviconLoader'
 
 // styles for responsiveness
 const useStyles = makeStyles(theme => {
@@ -66,22 +66,6 @@ const useStyles = makeStyles(theme => {
   } as const
 })
 
-const UnblockIcon = () => {
-  return (
-    <SvgIcon>
-      <path
-        id='unblock'
-        d='M6,12a5.966,5.966,0,0,1-2.336-.471,6.032,6.032,0,0,1-.887-.466L4.545,9.3A3.619,3.619,0,0,0,7.553,9.25L6.072,7.769l1.7-1.7L9.25,7.553A3.62,3.62,0,0,0,9.3,4.545l1.768-1.768a6.034,6.034,0,0,1,.466.887A6,6,0,0,1,6,12ZM.934,9.218h0A6,6,0,0,1,9.217.934L7.449,2.7a3.627,3.627,0,0,0-3,.048L5.924,4.227l-1.7,1.7L2.75,4.447a3.62,3.62,0,0,0-.048,3L.934,9.217Z'
-        fill='#cd6567'
-      />
-    </SvgIcon>
-  )
-}
-
-const Favicon = styled('img')({
-  width: '16px'
-})
-
 const Row = styled('div')({
   margin: '4px 8px 0',
   padding: '8px 16px',
@@ -90,7 +74,8 @@ const Row = styled('div')({
 })
 
 const DomainRow = styled(Grid)({
-  flexDirection: 'row'
+  flexDirection: 'row',
+  alignItems: 'center'
 })
 
 const ButtonDelete = styled(Button)({
@@ -145,11 +130,7 @@ const StreamList = (props: {
                   className={classes.domainRow}
                 >
                   <Grid item>
-                    <Favicon
-                      className={classes.favicon}
-                      width='16'
-                      src={config.favIcon ? config.favIcon : '../res/pp.svg'}
-                    />
+                    <FaviconLoader src={config.favIcon} />
                   </Grid>
                   <Grid item>
                     <Typography variant='h4' className={classes.domainH4}>
