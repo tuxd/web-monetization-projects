@@ -93,6 +93,11 @@ export class DisablingService {
     }
   }
 
+  /**
+   * TODO:
+   * Upon changes, must check all open tabs to see if they apply.
+   *
+   */
   setDisabled(activeTab: number, controls: DisablingControls) {
     const wasDisabled = Object.values(
       this.tabStates.get(activeTab).disabling
@@ -119,7 +124,7 @@ export class DisablingService {
       this.disabled[paymentPointer] = controls.disablePaymentPointer
     }
 
-    if (streamForTop && top) {
+    if (top) {
       const nowDisabled = Object.values(controls).some(Boolean)
       const nowEnabled = !nowDisabled
       if (wasDisabled && nowEnabled) {
