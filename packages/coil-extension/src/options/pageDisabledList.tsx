@@ -194,14 +194,12 @@ const StreamList = (props: {
 }
 
 export const PageDisabledList = () => {
-  const [streams, setStreams] = useState<BlockConfig[]>(STREAMS)
+  const [configs, setConfigs] = useState<BlockConfig[]>(STREAMS)
 
   const removeStream = (i: number) => {
-    const newStreams = streams
-    newStreams.splice(i, 1)
-    setStreams(newStreams)
-    console.log('streams', newStreams)
+    configs.splice(i, 1)
+    setConfigs([...configs])
   }
 
-  return <StreamList blockConfigs={streams} removeBlock={removeStream} />
+  return <StreamList blockConfigs={configs} removeBlock={removeStream} />
 }
