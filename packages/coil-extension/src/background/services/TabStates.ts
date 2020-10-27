@@ -58,6 +58,11 @@ export class TabStates {
     const state: TabState = {
       playState: 'playing',
       stickyState: 'auto',
+      disabling: {
+        disableDomain: false,
+        disablePaymentPointer: false,
+        disableUrl: false
+      },
       frameStates: {
         [0]: this.makeFrameStateDefault()
       }

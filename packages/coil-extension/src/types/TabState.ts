@@ -17,7 +17,7 @@ export interface FrameState {
 export interface TabState {
   favicon?: string
   coilSite?: string
-  disabling?: DisablingControls
+  disabling: DisablingControls
   stickyState: StickyState
   playState: PlayOrPauseState
   icon?: {
