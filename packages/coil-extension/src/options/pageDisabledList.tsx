@@ -11,7 +11,7 @@ import CloseIcon from '@material-ui/icons/Close'
 
 import { Colors } from '../shared-theme/colors'
 
-import { STREAMS } from './streams'
+import { MOCK_BLOCK_DATA } from './MOCK_BLOCK_DATA'
 import { BlockConfig } from './interfaces'
 import { FaviconLoader } from './faviconLoader'
 
@@ -130,7 +130,7 @@ const StreamList = (props: {
                   className={classes.domainRow}
                 >
                   <Grid item>
-                    <FaviconLoader src={config.favIcon} />
+                    <FaviconLoader origin={config.value} src={config.favIcon} />
                   </Grid>
                   <Grid item>
                     <Typography variant='h4' className={classes.domainH4}>
@@ -175,7 +175,7 @@ const StreamList = (props: {
 }
 
 export const PageDisabledList = () => {
-  const [configs, setConfigs] = useState<BlockConfig[]>(STREAMS)
+  const [configs, setConfigs] = useState<BlockConfig[]>(MOCK_BLOCK_DATA)
 
   const removeStream = (i: number) => {
     configs.splice(i, 1)

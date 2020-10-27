@@ -12,22 +12,34 @@ const useStyles = makeStyles({
   }
 })
 
-export const FaviconLoader = (props: { src: string | undefined }) => {
-  const { src } = props
-  const [imgPath, setImgPath] = useState(src)
+export const FaviconLoader = (props: {
+  origin: string
+  src: string | undefined
+}) => {
+  // url or payment pointer
+  const favicon =
+    props.src ||
+    `${new URL(origin.replace(/^$/, 'https://')).origin}/favicon.ico`
+
+  // Start with /no-favicon
+  const [imgPath, setImgPath] = useState('/res/no-favicon.svg')
   const classes = useStyles()
 
-  useEffect(() => {
-    if (src === undefined) {
-      setImgPath('../res/pp.svg')
+  function onError() {
+    if (origin.startsWith('$')) {
+      setImgPath('/res/pp.svg')
     }
-  }, [])
-
-  const onFaviconError = () => {
-    setImgPath('../res/no-favicon.svg')
   }
 
   return (
-    <img className={classes.favicon} src={imgPath} onError={onFaviconError} />
+    <>
+      <img
+        style={{ display: 'none' }}
+        src={favicon}
+        onLoad={() => setImgPath(favicon)}
+        onError={onError}
+      />
+      <img className={classes.favicon} src={imgPath} />
+    </>
   )
 }

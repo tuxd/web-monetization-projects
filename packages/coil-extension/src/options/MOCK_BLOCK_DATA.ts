@@ -1,6 +1,6 @@
 import { BlockConfig } from './interfaces'
 
-export const STREAMS: BlockConfig[] = [
+export const MOCK_BLOCK_DATA: BlockConfig[] = [
   {
     type: 'Domain',
     value: 'https://www.google.com',
@@ -22,8 +22,8 @@ export const STREAMS: BlockConfig[] = [
   },
   {
     type: 'URL',
-    value: 'https://netflix.com',
-    favIcon: 'https://netflix.com/favicon.ico'
+    value: 'https://netflix.com'
+    // favIcon: 'https://netflix.com/favicon.ico'
   },
   {
     type: 'Payment Pointer',
