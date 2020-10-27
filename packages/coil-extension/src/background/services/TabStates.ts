@@ -70,9 +70,11 @@ export class TabStates {
     return state
   }
 
-  private makeFrameStateDefault() {
+  private makeFrameStateDefault(): FrameState {
     return {
       monetized: false,
+      streams: {},
+      disabled: false,
       adapted: false,
       total: 0,
       lastMonetization: {

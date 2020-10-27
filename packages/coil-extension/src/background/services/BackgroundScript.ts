@@ -640,7 +640,9 @@ export class BackgroundScript {
 
     this.tabStates.logLastMonetizationCommand(frame, 'start')
     const tabState = this.tabStates.get(frame.tabId)
-    const disabled = Object.values(tabState.disabling).some(Boolean)
+    const disabled =
+      Object.values(tabState.disabling).some(Boolean) ||
+      this.disabling.isDisabled(frame, request.data.paymentPointer)
     if (tabState.playState === 'paused' || disabled) {
       this.tabStates.logLastMonetizationCommand(frame, 'pause')
     }

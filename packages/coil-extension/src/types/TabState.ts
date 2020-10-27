@@ -6,6 +6,9 @@ export type MonetizationCommand = 'pause' | 'stop' | 'start' | 'resume'
 export interface FrameState {
   adapted: boolean
   monetized: boolean
+  // via blocking controls
+  disabled: boolean
+  streams: Record<string, string> // StreamId : PaymentPointer
   // Tracks the total amount of `source` money sent (not was received)
   total: number
   lastMonetization: {

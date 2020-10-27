@@ -5,6 +5,7 @@ import { FrameSpec } from '../../types/FrameSpec'
 import { DisablingControls } from '../../types/disabling'
 import * as tokens from '../../types/tokens'
 import { LocalStorageProxy } from '../../types/storage'
+import { notNullOrUndef } from '../../util/nullables'
 
 import { TabStates } from './TabStates'
 import { BackgroundFramesService } from './BackgroundFramesService'
@@ -58,7 +59,7 @@ export class DisablingService {
    * @return `true` if frame's stream needs disabling,
    *         `false` if frame's stream potentially needs enabling
    */
-  onUrlChanged(frame: FrameSpec, url: string): boolean {
+  onUrlChanged(frame: FrameSpec, url: string): void {
     const tab = frame.tabId
     const isTopFrame = frame.frameId === 0
     const urlObject = new URL(url)
@@ -72,8 +73,7 @@ export class DisablingService {
       disabling.disableUrl = urlDisabled
       this.tabStates.set(tab, { disabling })
     }
-
-    return urlDisabled || domainDisabled
+    // TODO: if disable rules apply, then apply enable or disable
   }
 
   /**
@@ -95,10 +95,34 @@ export class DisablingService {
 
   /**
    * TODO:
-   * Upon changes, must check all open tabs to see if they apply.
+   * Upon changes, must check all open tabs/frames to see if they apply and
+   * update the tab state accordingly.
+   *
+   * Disable payment pointer could potentially only disable the top level
+   * payment pointer, but not iframes ?
    *
    */
   setDisabled(activeTab: number, controls: DisablingControls) {
+    const prior: Array<{
+      frame: FrameSpec
+      streamId: string
+      disabled: boolean
+      href: string
+      paymentPointer?: string
+    }> = this.streams.getStreams().map(([streamId, stream]) => {
+      const frame = this.assoc.getFrame(streamId)
+      const disabled = this.tabStates.getFrameOrDefault(frame).disabled
+      const paymentPointer = stream.getPaymentPointer()
+      const href = notNullOrUndef(this.framesService.getFrame(frame)).href
+      return {
+        disabled,
+        frame,
+        streamId,
+        paymentPointer,
+        href
+      }
+    })
+
     const wasDisabled = Object.values(
       this.tabStates.get(activeTab).disabling
     ).some(Boolean)
@@ -124,14 +148,29 @@ export class DisablingService {
       this.disabled[paymentPointer] = controls.disablePaymentPointer
     }
 
-    if (top) {
-      const nowDisabled = Object.values(controls).some(Boolean)
-      const nowEnabled = !nowDisabled
-      if (wasDisabled && nowEnabled) {
-        this.resume(topFrame)
-      } else if (wasNotDisabled && nowDisabled) {
-        this.pause(topFrame)
-      }
+    const nowDisabled = Object.values(controls).some(Boolean)
+    const nowEnabled = !nowDisabled
+    if (wasDisabled && nowEnabled) {
+      this.resume(topFrame)
+    } else if (wasNotDisabled && nowDisabled) {
+      this.pause(topFrame)
+    }
+  }
+
+  isDisabled(frame: FrameSpec, paymentPointer: string) {
+    const urlObject = new URL(
+      notNullOrUndef(this.framesService.getFrame(frame)?.href)
+    )
+    const { href, origin } = urlObject
+    // TODO: normalize
+    if (this.disabled[paymentPointer]) {
+      return true
+    }
+    if (this.disabled[href]) {
+      return true
+    }
+    if (this.disabled[origin]) {
+      return true
     }
   }
 }
