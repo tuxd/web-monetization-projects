@@ -24,6 +24,8 @@ import { StreamAssociations } from './StreamAssociations'
 @injectable()
 export class DisablingService {
   disabled: Record<string, boolean> = {}
+  private pause!: (frame: FrameSpec) => void
+  private resume!: (frame: FrameSpec) => void
 
   constructor(
     private storageService: StorageService,
@@ -41,6 +43,17 @@ export class DisablingService {
     })
   }
 
+  setPauseResume({
+    pause,
+    resume
+  }: {
+    pause: (frame: FrameSpec) => void
+    resume: (frame: FrameSpec) => void
+  }) {
+    this.pause = pause
+    this.resume = resume
+  }
+
   /**
    * @return `true` if frame's stream needs disabling,
    *         `false` if frame's stream potentially needs enabling
@@ -50,8 +63,8 @@ export class DisablingService {
     const isTopFrame = frame.frameId === 0
     const urlObject = new URL(url)
     const { href, origin } = urlObject
-    const urlDisabled = this.disabled[href]
-    const domainDisabled = this.disabled[origin]
+    const urlDisabled = Boolean(this.disabled[href])
+    const domainDisabled = Boolean(this.disabled[origin])
 
     if (isTopFrame) {
       const disabling = this.tabStates.get(tab).disabling
@@ -71,7 +84,7 @@ export class DisablingService {
     const tab = frame.tabId
     const isTopFrame = frame.frameId === 0
     const disabledPaymentPointer = paymentPointer
-      ? this.disabled[paymentPointer]
+      ? Boolean(this.disabled[paymentPointer])
       : false
     if (isTopFrame) {
       const disabling = this.tabStates.get(tab).disabling
@@ -81,13 +94,18 @@ export class DisablingService {
   }
 
   setDisabled(activeTab: number, controls: DisablingControls) {
+    const wasDisabled = Object.values(
+      this.tabStates.get(activeTab).disabling
+    ).some(Boolean)
+    const wasNotDisabled = !wasDisabled
+
+    this.tabStates.set(activeTab, { disabling: controls })
+
     const frames = this.framesService.getFrames(activeTab)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const top = frames.find(f => f.top)!
-    const streamForTop = this.assoc.getStreamId({
-      tabId: activeTab,
-      frameId: 0
-    })
+    const topFrame = { tabId: activeTab, frameId: 0 }
+    const streamForTop = this.assoc.getStreamId(topFrame)
 
     const paymentPointer = streamForTop
       ? this.streams.getStream(streamForTop).getPaymentPointer()
@@ -99,6 +117,16 @@ export class DisablingService {
     this.disabled[origin] = controls.disableDomain
     if (paymentPointer) {
       this.disabled[paymentPointer] = controls.disablePaymentPointer
+    }
+
+    if (streamForTop && top) {
+      const nowDisabled = Object.values(controls).some(Boolean)
+      const nowEnabled = !nowDisabled
+      if (wasDisabled && nowEnabled) {
+        this.resume(topFrame)
+      } else if (wasNotDisabled && nowDisabled) {
+        this.pause(topFrame)
+      }
     }
   }
 }

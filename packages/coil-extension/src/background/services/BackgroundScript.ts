@@ -99,6 +99,10 @@ export class BackgroundScript {
     this.framesService.monitor()
     // noinspection ES6MissingAwait
     void this.auth.getTokenMaybeRefreshAndStoreState()
+    this.disabling.setPauseResume({
+      pause: this.doPauseWebMonetization.bind(this),
+      resume: this.doResumeWebMonetization.bind(this)
+    })
   }
 
   private setTabsOnActivatedListener() {
@@ -632,9 +636,12 @@ export class BackgroundScript {
   ) {
     const frame = getFrameSpec(sender)
     const { tabId, frameId } = frame
+    this.disabling.onPaymentPointerChanged(frame, request.data.paymentPointer)
 
     this.tabStates.logLastMonetizationCommand(frame, 'start')
-    if (this.tabStates.get(frame.tabId).playState === 'paused') {
+    const tabState = this.tabStates.get(frame.tabId)
+    const disabled = Object.values(tabState.disabling).some(Boolean)
+    if (tabState.playState === 'paused' || disabled) {
       this.tabStates.logLastMonetizationCommand(frame, 'pause')
     }
 
@@ -811,7 +818,9 @@ export class BackgroundScript {
   }
 
   stopWebMonetization(sender: MessageSender) {
-    return this.doStopWebMonetization(getFrameSpec(sender))
+    const frame = getFrameSpec(sender)
+    this.disabling.onPaymentPointerChanged(frame, null)
+    return this.doStopWebMonetization(frame)
   }
 
   private doStopWebMonetization(frame: FrameSpec) {
@@ -965,7 +974,7 @@ export class BackgroundScript {
     const tabId = this.activeTab
     const currentUrl = this.framesService.getFrame({ frameId: 0, tabId })?.href
     console.log('SET_DISABLING', { currentUrl })
-    this.tabStates.set(tabId, { disabling: request.data })
+    this.disabling.setDisabled(tabId, request.data)
     this.reloadTabState({ from: 'setDisabling' })
   }
 }
